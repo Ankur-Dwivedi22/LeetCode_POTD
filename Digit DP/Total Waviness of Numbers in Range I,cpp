@@ -1,0 +1,89 @@
+// Approach : Implementation
+// TC : O(num2 * log num2)
+// SC : O(log num2)
+class Solution
+{
+public:
+    int totalWaviness(int num1, int num2)
+    {
+        int ans = 0;
+        for (int num = num1; num <= num2; num++)
+        {
+            string s = to_string(num);
+            int ct = 0;
+            for (int i = 1; i < s.size() - 1; i++)
+            {
+                if (s[i] > s[i - 1] && s[i] > s[i + 1])
+                    ct++;
+                else if (s[i] < s[i - 1] && s[i] < s[i + 1])
+                    ct++;
+            }
+            ans += ct;
+        }
+
+        return ans;
+    }
+};
+
+// Approach 2 : Digit DP
+// TC : O(7 * 11 * 11 * 2 * 2 * 7)
+// SC : O(7 * 11 * 11 * 2 * 2 * 7)
+
+class Solution
+{
+public:
+    int dp[7][11][11][2][2][7];
+    int dp_func(int ind, int prev, int curr, bool tight, bool started, int wav, string &s)
+    {
+        if (ind == s.size())
+        {
+            return wav;
+        }
+
+        if (dp[ind][prev + 1][curr + 1][tight][started][wav] != -1)
+            return dp[ind][prev + 1][curr + 1][tight][started][wav];
+
+        int lb = 0;
+        int ub = (tight ? s[ind] - '0' : 9);
+        int ans = 0;
+
+        for (int dig = lb; dig <= ub; dig++)
+        {
+            bool next_started = (started || dig > 0);
+            int next_prev = (started ? curr : -1);
+            int next_curr = (next_started ? dig : -1);
+            bool next_tight = (tight && dig == ub);
+
+            int is_wave = 0;
+            if (started && prev != -1 && curr != -1)
+            {
+                if ((prev < curr && curr > dig) || (prev > curr && curr < dig))
+                {
+                    is_wave = 1;
+                }
+            }
+
+            ans += dp_func(ind + 1, next_prev, next_curr, next_tight, next_started, wav + is_wave, s);
+        }
+
+        return dp[ind][prev + 1][curr + 1][tight][started][wav] = ans;
+    }
+
+    int solve(int n)
+    {
+        if (n < 100)
+            return 0;
+
+        string s = to_string(n);
+        memset(dp, -1, sizeof(dp));
+        return dp_func(0, -1, -1, true, false, 0, s);
+    }
+
+    int totalWaviness(int num1, int num2)
+    {
+        int left = solve(num1 - 1);
+        int right = solve(num2);
+
+        return right - left;
+    }
+};
