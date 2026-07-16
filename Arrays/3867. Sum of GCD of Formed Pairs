@@ -1,0 +1,19 @@
+class Solution {
+public:
+    using ll = long long;
+    long long gcdSum(vector<int>& nums) {
+        int mx = 0, n = nums.size();
+        for(int &x : nums){
+            mx = max(mx, x);
+            x = __gcd(x, mx);
+        }
+
+        sort(nums.begin(), nums.end());
+        ll sum = 0;
+        for(int i=0, j=n-1; i<j; i++, j--){
+            sum += __gcd(nums[i], nums[j]);
+        }
+
+        return sum;
+    }
+};
