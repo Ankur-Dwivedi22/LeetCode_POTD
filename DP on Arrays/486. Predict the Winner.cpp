@@ -29,3 +29,24 @@ public:
         return dp[0][n - 1] >= 0;
     }
 };
+
+// TC : O(N)
+// SC : O(N)
+class Solution {
+public:
+    bool predictTheWinner(vector<int>& nums) {
+        int n = nums.size();
+        if(n % 2 == 0){
+            return true;
+        }
+
+        vector<int> dp = nums;
+        for(int left=n-2; left>=0; left--){
+            for(int right=left+1; right<n; right++){
+                dp[right] = max(nums[left] - dp[right], nums[right] - dp[right-1]);
+            }
+        }
+
+        return(dp[n-1] >= 0);
+    }
+};
